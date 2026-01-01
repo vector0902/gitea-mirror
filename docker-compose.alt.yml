@@ -7,6 +7,8 @@ services:
     image: ghcr.io/raylabshq/gitea-mirror:latest
     container_name: gitea-mirror
     restart: unless-stopped
+    # networks:
+    #   - gitea
     ports:
       - "${PORT:-4321}:4321"
     user: ${PUID:-1000}:${PGID:-1000}
@@ -30,6 +32,9 @@ services:
       # If you want perfect ordering of issues and PRs, set these at 1
       - MIRROR_ISSUE_CONCURRENCY=${MIRROR_ISSUE_CONCURRENCY:-3}
       - MIRROR_PULL_REQUEST_CONCURRENCY=${MIRROR_PULL_REQUEST_CONCURRENCY:-5}
+
+      - SKIP_FORKS=true
+
       
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=3", "--spider", "http://localhost:4321/api/health"]
@@ -37,6 +42,26 @@ services:
       timeout: 10s
       retries: 5
       start_period: 15s
+
+
+  gitea:
+    # image: docker.gitea.com/gitea:1.25.3
+    image: docker.gitea.com/gitea
+    # container_name: gitea
+    # environment:
+    #   - USER_UID=1000
+    #   - USER_GID=1000
+    # restart: always
+    # networks:
+    #   - gitea
+    volumes:
+      - ./gitea:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "3000:3000"
+      - "222:22"
+
 
 # === QUICK START ===
 #
@@ -59,3 +84,7 @@ services:
 #    - Cleanup preferences
 #
 # That's it! Everything else can be configured via the web interface.
+
+# networks:
+#   gitea:
+#     external: true
