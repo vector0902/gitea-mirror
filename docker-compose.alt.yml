@@ -11,7 +11,7 @@ services:
     #   - gitea
     ports:
       - "${PORT:-4321}:4321"
-    user: ${PUID:-1000}:${PGID:-1000}
+    # user: ${PUID:-1000}:${PGID:-1000}
     volumes:
       - ./data:/app/data
     environment:
